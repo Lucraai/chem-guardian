@@ -1,0 +1,593 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>化工安全标准顾问 Agent</title>
+  <style>
+    :root {
+      --bg: #08101f;
+      --panel: rgba(12, 17, 31, 0.78);
+      --card: rgba(17, 24, 39, 0.86);
+      --text: #e8f1ff;
+      --muted: #91a6c8;
+      --accent: #4f8cff;
+      --accent-2: #16c8c0;
+      --danger: #f87171;
+      --warn: #f59e0b;
+      --ok: #34d399;
+      --border: rgba(255, 255, 255, 0.09);
+      --shadow: 0 24px 70px rgba(0, 0, 0, 0.26);
+      font-synthesis-weight: none;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background:
+        radial-gradient(circle at top left, rgba(79, 140, 255, 0.18), transparent 28%),
+        radial-gradient(circle at top right, rgba(22, 200, 192, 0.12), transparent 24%),
+        linear-gradient(180deg, #08101f 0%, #0d172a 45%, #111827 100%);
+      color: var(--text);
+      font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    .wrap {
+      max-width: 1320px;
+      margin: 0 auto;
+      padding: 36px 20px 64px;
+    }
+
+    .hero {
+      display: grid;
+      grid-template-columns: 1.35fr 0.65fr;
+      gap: 18px;
+      align-items: end;
+      margin-bottom: 22px;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 12px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.04);
+      color: var(--muted);
+      margin-bottom: 14px;
+    }
+
+    .dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--ok);
+      box-shadow: 0 0 14px rgba(52, 211, 153, 0.5);
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(34px, 4vw, 58px);
+      line-height: 1.02;
+      letter-spacing: -0.04em;
+    }
+
+    .sub {
+      margin: 14px 0 0;
+      max-width: 860px;
+      color: var(--muted);
+      line-height: 1.7;
+      font-size: 15px;
+    }
+
+    .meta {
+      justify-self: end;
+      display: grid;
+      gap: 10px;
+      padding: 18px;
+      border-radius: 20px;
+      border: 1px solid var(--border);
+      background: var(--panel);
+      box-shadow: var(--shadow);
+      color: var(--muted);
+      min-width: 240px;
+    }
+
+    .meta strong { color: var(--text); }
+
+    .toolbar {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 12px;
+      margin: 18px 0 22px;
+    }
+
+    .chip {
+      border-radius: 16px;
+      padding: 12px 14px;
+      border: 1px solid var(--border);
+      background: rgba(255,255,255,0.04);
+      color: var(--text);
+      cursor: pointer;
+      text-align: left;
+    }
+
+    .chip small {
+      display: block;
+      color: var(--muted);
+      margin-top: 4px;
+      line-height: 1.5;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(12, 1fr);
+      gap: 18px;
+    }
+
+    .card {
+      grid-column: span 6;
+      border-radius: 22px;
+      border: 1px solid var(--border);
+      background: var(--card);
+      box-shadow: var(--shadow);
+      padding: 20px;
+      backdrop-filter: blur(14px);
+    }
+
+    .card.full { grid-column: 1 / -1; }
+    .card.third { grid-column: span 4; }
+
+    .card h2 {
+      margin: 0 0 14px;
+      font-size: 20px;
+      letter-spacing: -0.02em;
+    }
+
+    .field {
+      display: grid;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+
+    label {
+      font-size: 13px;
+      color: #bfd0ef;
+    }
+
+    input, textarea, button {
+      width: 100%;
+      border-radius: 14px;
+      border: 1px solid rgba(255,255,255,0.10);
+      background: rgba(6, 10, 18, 0.76);
+      color: var(--text);
+      padding: 13px 14px;
+      outline: none;
+      font-size: 14px;
+    }
+
+    textarea {
+      min-height: 140px;
+      resize: vertical;
+      line-height: 1.65;
+    }
+
+    input[type="file"] {
+      padding: 10px;
+    }
+
+    button {
+      cursor: pointer;
+      font-weight: 700;
+      border: 0;
+      background: linear-gradient(135deg, var(--accent), #6c63ff);
+      transition: transform 0.15s ease, opacity 0.15s ease;
+    }
+
+    button:hover { transform: translateY(-1px); }
+    button:active { transform: translateY(0); opacity: 0.92; }
+
+    .row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    .row.three {
+      grid-template-columns: 1fr 1fr 1fr;
+    }
+
+    pre {
+      margin: 0;
+      min-height: 150px;
+      padding: 16px;
+      border-radius: 16px;
+      border: 1px solid rgba(255,255,255,0.08);
+      background: rgba(6, 10, 18, 0.82);
+      color: #d6e5ff;
+      white-space: pre-wrap;
+      word-break: break-word;
+      line-height: 1.65;
+    }
+
+    .hint {
+      margin-top: 8px;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.6;
+    }
+
+    @media (max-width: 980px) {
+      .hero, .meta, .card, .card.third, .toolbar, .row, .row.three {
+        grid-template-columns: 1fr;
+        grid-column: 1 / -1;
+      }
+      .meta { justify-self: stretch; }
+      .toolbar { margin-top: 16px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="hero">
+      <div>
+        <div class="badge"><span class="dot"></span>私有化部署 · 化工安全标准顾问 Agent</div>
+        <h1>标准问答、场景分析、清单生成、票证预审，一次打通</h1>
+        <p class="sub">
+          这个工作台直接调用 Java 后端，Java 再转发到 Python AI 服务。
+          你可以上传文本、PDF、Word 文档，也可以直接提问、做场景分析、生成检查清单、做票证预审。
+        </p>
+      </div>
+      <div class="meta">
+        <div><strong>Java</strong> :8080</div>
+        <div><strong>Python AI</strong> :8000</div>
+        <div><strong>Vector DB</strong> Qdrant</div>
+        <div><strong>Mode</strong> Private Deploy</div>
+      </div>
+    </div>
+
+    <div class="toolbar">
+      <button class="chip" id="fillDemoBtn">
+        一键填充演示
+        <small>快速生成一个可演示的问答和上传样例</small>
+      </button>
+      <button class="chip" id="standardsBtn">
+        打开标准库
+        <small>按标准号、标签和场景浏览国标目录</small>
+      </button>
+      <button class="chip" id="syncStandardsBtn">
+        同步到知识库
+        <small>把标准库条目灌进 AI 检索库</small>
+      </button>
+      <button class="chip" id="healthBtn">
+        检查服务状态
+        <small>同时检查 Java 与 Python 是否在线</small>
+      </button>
+      <button class="chip" id="seedBtn">
+        导入样例标准
+        <small>把示例标准文本入库后立刻可检索</small>
+      </button>
+      <button class="chip" id="importStdBtn">
+        导入标准库
+        <small>打开标准库导入页，批量新增或更新条目</small>
+      </button>
+      <button class="chip" id="clearBtn">
+        清空结果
+        <small>让页面回到初始状态</small>
+      </button>
+    </div>
+
+    <div class="grid">
+      <section class="card">
+        <h2>标准问答</h2>
+        <div class="field">
+          <label for="question">问题</label>
+          <textarea id="question" placeholder="例如：动火作业前需要确认哪些内容？"></textarea>
+        </div>
+        <div class="row">
+          <div class="field">
+            <label for="tenantIdAsk">租户 ID</label>
+            <input id="tenantIdAsk" type="number" value="1" />
+          </div>
+          <div class="field" style="align-self:end">
+            <button id="askBtn">开始提问</button>
+          </div>
+        </div>
+        <pre id="askResult">等待提问结果...</pre>
+      </section>
+
+      <section class="card">
+        <h2>场景分析</h2>
+        <div class="field">
+          <label for="scenario">场景描述</label>
+          <textarea id="scenario" placeholder="例如：车间检修时进行受限空间作业，需要审批和监护。"></textarea>
+        </div>
+        <div class="row">
+          <div class="field">
+            <label for="tenantIdScenario">租户 ID</label>
+            <input id="tenantIdScenario" type="number" value="1" />
+          </div>
+          <div class="field" style="align-self:end">
+            <button id="analyzeBtn">分析场景</button>
+          </div>
+        </div>
+        <pre id="scenarioResult">等待分析结果...</pre>
+      </section>
+
+      <section class="card">
+        <h2>检查清单生成</h2>
+        <div class="field">
+          <label for="checklistScenario">场景</label>
+          <textarea id="checklistScenario" placeholder="例如：临时用电作业"></textarea>
+        </div>
+        <div class="row">
+          <div class="field">
+            <label for="tenantIdChecklist">租户 ID</label>
+            <input id="tenantIdChecklist" type="number" value="1" />
+          </div>
+          <div class="field" style="align-self:end">
+            <button id="checklistBtn">生成清单</button>
+          </div>
+        </div>
+        <pre id="checklistResult">等待清单结果...</pre>
+      </section>
+
+      <section class="card">
+        <h2>票证预审</h2>
+        <div class="row">
+          <div class="field">
+            <label for="ticketType">票证类型</label>
+            <input id="ticketType" placeholder="例如：动火票 / 受限空间票" value="动火票" />
+          </div>
+          <div class="field">
+            <label for="tenantIdTicket">租户 ID</label>
+            <input id="tenantIdTicket" type="number" value="1" />
+          </div>
+        </div>
+        <div class="field">
+          <label for="ticketContent">票证内容 JSON</label>
+          <textarea id="ticketContent">{ "monitoring": true, "gas_detection": true, "approval": true }</textarea>
+        </div>
+        <button id="precheckBtn">开始预审</button>
+        <div class="hint">提示：这里直接提交 JSON，对应企业内部作业票字段即可。</div>
+        <pre id="ticketResult">等待预审结果...</pre>
+      </section>
+
+      <section class="card full">
+        <h2>文档上传入库</h2>
+        <div class="field">
+          <label for="file">文档文件</label>
+          <input id="file" type="file" />
+        </div>
+        <div class="row three">
+          <div class="field">
+            <label for="documentName">文档名称</label>
+            <input id="documentName" placeholder="例如：GB 30871-2022 特殊作业安全规范" />
+          </div>
+          <div class="field">
+            <label for="docType">文档类型</label>
+            <input id="docType" placeholder="例如：GB / 企业制度 / SOP" value="GB" />
+          </div>
+          <div class="field">
+            <label for="documentCode">文档编号</label>
+            <input id="documentCode" placeholder="可选" />
+          </div>
+        </div>
+        <div class="row three">
+          <div class="field">
+            <label for="version">版本</label>
+            <input id="version" placeholder="可选" />
+          </div>
+          <div class="field">
+            <label for="sourceUri">来源 URI</label>
+            <input id="sourceUri" placeholder="可选" />
+          </div>
+          <div class="field">
+            <label for="tenantIdUpload">租户 ID</label>
+            <input id="tenantIdUpload" type="number" value="1" />
+          </div>
+        </div>
+        <button id="uploadBtn">上传并入库</button>
+        <div class="hint">支持 txt、md、pdf、docx；图片会尽量 OCR 识别；扫描版 PDF 当前先做文本抽取，后续可以继续增强。</div>
+        <pre id="uploadResult">等待上传结果...</pre>
+      </section>
+
+      <section class="card full">
+        <h2>快速状态</h2>
+        <div class="row">
+          <button id="demoAskBtn">填充动火示例</button>
+          <button id="demoUploadBtn">填充上传示例</button>
+        </div>
+        <pre id="statusResult">点击上面的按钮，快速演示整条链路。</pre>
+      </section>
+    </div>
+  </div>
+
+  <script>
+    const $ = (id) => document.getElementById(id);
+    const pretty = (obj) => JSON.stringify(obj, null, 2);
+    const set = (id, value) => $(id).textContent = value;
+
+    async function postJson(url, payload) {
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+      return response.json();
+    }
+
+    async function healthCheck() {
+      set('statusResult', '检查中...');
+      try {
+        const [javaRes, pyRes] = await Promise.all([
+          fetch('/api/health').then(r => r.json()),
+          fetch('http://localhost:8000/health').then(r => r.json()),
+        ]);
+        set('statusResult', pretty({ java: javaRes, python: pyRes }));
+      } catch (error) {
+        set('statusResult', '服务检查失败：' + error.message);
+      }
+    }
+
+    async function syncStandards() {
+      set('statusResult', '正在同步标准库到知识库...');
+      try {
+        const response = await fetch('/api/standards/library/sync', { method: 'POST' });
+        const result = await response.json();
+        set('statusResult', pretty(result));
+      } catch (error) {
+        set('statusResult', '同步失败：' + error.message);
+      }
+    }
+
+    async function ask() {
+      set('askResult', '提问中...');
+      try {
+        const result = await postJson('/api/advisor/ask', {
+          question: $('question').value,
+          tenant_id: Number($('tenantIdAsk').value || 1),
+        });
+        set('askResult', pretty(result));
+      } catch (error) {
+        set('askResult', '提问失败：' + error.message);
+      }
+    }
+
+    async function analyzeScenario() {
+      set('scenarioResult', '分析中...');
+      try {
+        const result = await postJson('/api/advisor/analyze-scenario', {
+          scenario: $('scenario').value,
+          tenantId: Number($('tenantIdScenario').value || 1),
+        });
+        set('scenarioResult', pretty(result));
+      } catch (error) {
+        set('scenarioResult', '分析失败：' + error.message);
+      }
+    }
+
+    async function generateChecklist() {
+      set('checklistResult', '生成中...');
+      try {
+        const result = await postJson('/api/advisor/generate-checklist', {
+          scenario: $('checklistScenario').value,
+          tenantId: Number($('tenantIdChecklist').value || 1),
+        });
+        set('checklistResult', pretty(result));
+      } catch (error) {
+        set('checklistResult', '生成失败：' + error.message);
+      }
+    }
+
+    async function precheckTicket() {
+      set('ticketResult', '预审中...');
+      try {
+        const content = JSON.parse($('ticketContent').value);
+        const result = await postJson('/api/advisor/precheck-ticket', {
+          ticketType: $('ticketType').value,
+          content,
+          tenantId: Number($('tenantIdTicket').value || 1),
+        });
+        set('ticketResult', pretty(result));
+      } catch (error) {
+        set('ticketResult', '预审失败：' + error.message);
+      }
+    }
+
+    async function uploadDocument() {
+      set('uploadResult', '上传中...');
+      try {
+        if (!$('file').files.length) {
+          throw new Error('请先选择文件。');
+        }
+        const form = new FormData();
+        form.append('file', $('file').files[0]);
+        form.append('document_name', $('documentName').value);
+        form.append('doc_type', $('docType').value);
+        if ($('documentCode').value) form.append('document_code', $('documentCode').value);
+        if ($('version').value) form.append('version', $('version').value);
+        if ($('sourceUri').value) form.append('source_uri', $('sourceUri').value);
+        form.append('tenant_id', $('tenantIdUpload').value || '1');
+
+        const response = await fetch('/api/documents/upload', { method: 'POST', body: form });
+        set('uploadResult', pretty(await response.json()));
+      } catch (error) {
+        set('uploadResult', '上传失败：' + error.message);
+      }
+    }
+
+    function fillDemo() {
+      $('question').value = '动火作业前需要确认哪些内容？';
+      $('scenario').value = '车间检修时进行受限空间作业，需要审批、通风和监护。';
+      $('checklistScenario').value = '临时用电作业';
+      $('ticketType').value = '动火票';
+      $('ticketContent').value = '{ "monitoring": true, "gas_detection": true, "approval": true }';
+      $('documentName').value = 'GB 30871-2022 特殊作业安全规范';
+      $('docType').value = 'GB';
+      $('documentCode').value = 'GB-30871';
+      $('version').value = '2022';
+      $('sourceUri').value = 'local-demo';
+      set('statusResult', '已填充演示数据。');
+    }
+
+    function fillUploadDemo() {
+      $('documentName').value = 'GB 30871-2022 特殊作业安全规范';
+      $('docType').value = 'GB';
+      $('documentCode').value = 'GB-30871';
+      $('version').value = '2022';
+      $('sourceUri').value = 'docs/sample_standard_hot_work.md';
+      set('statusResult', '请选择 docs/sample_standard_hot_work.md 或任意标准文件进行上传。');
+    }
+
+    function clearResults() {
+      set('askResult', '等待提问结果...');
+      set('scenarioResult', '等待分析结果...');
+      set('checklistResult', '等待清单结果...');
+      set('ticketResult', '等待预审结果...');
+      set('uploadResult', '等待上传结果...');
+      set('statusResult', '已清空。');
+    }
+
+    async function seedDemo() {
+      set('statusResult', '正在导入示例标准...');
+      try {
+        const result = await fetch('/api/documents/ingest', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            document_code: 'GB-30871-SEED',
+            document_name: 'GB 30871-2022 Special Work Safety Example',
+            doc_type: 'GB',
+            version: '2022',
+            source_uri: '/docs/sample_standard_hot_work.md',
+            raw_text: `Hot work usually requires confirmation of the work scope, approval status, on-site monitoring, fire protection measures, and gas detection before execution.\n\nThe work permit should define the operation area, validity period, approval flow, monitoring responsibilities, and emergency response arrangements.\n\nThe site owner should verify that fire extinguishing equipment, isolation measures, and monitoring personnel are in place before work begins.\n\nConfined space work usually requires ventilation, detection, guardian assignment, emergency rescue readiness, and work approval, with continuous risk monitoring.\n\nTemporary power use usually requires inspection of wiring, protection devices, approval scope, validity period, and site patrol requirements to avoid extra risks.`,
+            tenant_id: 1
+          }),
+        }).then(r => r.json());
+        set('statusResult', pretty({ seed: result, tip: '现在可以直接提问“动火作业前需要确认哪些内容？”' }));
+      } catch (error) {
+        set('statusResult', '导入失败：' + error.message);
+      }
+    }
+
+    $('askBtn').addEventListener('click', ask);
+    $('analyzeBtn').addEventListener('click', analyzeScenario);
+    $('checklistBtn').addEventListener('click', generateChecklist);
+    $('precheckBtn').addEventListener('click', precheckTicket);
+    $('uploadBtn').addEventListener('click', uploadDocument);
+    $('healthBtn').addEventListener('click', healthCheck);
+    $('fillDemoBtn').addEventListener('click', fillDemo);
+    $('standardsBtn').addEventListener('click', () => { window.location.href = '/standards.html'; });
+    $('syncStandardsBtn').addEventListener('click', syncStandards);
+    $('demoAskBtn').addEventListener('click', fillDemo);
+    $('demoUploadBtn').addEventListener('click', fillUploadDemo);
+    $('seedBtn').addEventListener('click', seedDemo);
+    $('importStdBtn').addEventListener('click', () => { window.location.href = '/standard-import.html'; });
+    $('clearBtn').addEventListener('click', clearResults);
+  </script>
+</body>
+</html>

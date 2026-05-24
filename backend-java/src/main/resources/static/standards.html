@@ -1,0 +1,390 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>标准库 · 化工安全标准顾问</title>
+  <style>
+    :root {
+      --bg: #07111f;
+      --panel: rgba(16, 22, 36, 0.82);
+      --card: rgba(19, 27, 44, 0.88);
+      --text: #e8f1ff;
+      --muted: #8ea4c8;
+      --accent: #4f8cff;
+      --ok: #34d399;
+      --border: rgba(255, 255, 255, 0.09);
+      --shadow: 0 24px 70px rgba(0, 0, 0, 0.25);
+      font-synthesis-weight: none;
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background:
+        radial-gradient(circle at top left, rgba(79, 140, 255, 0.18), transparent 28%),
+        radial-gradient(circle at top right, rgba(52, 211, 153, 0.12), transparent 22%),
+        linear-gradient(180deg, #07111f 0%, #0d172a 45%, #111827 100%);
+      color: var(--text);
+      font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    .wrap {
+      max-width: 1320px;
+      margin: 0 auto;
+      padding: 36px 20px 64px;
+    }
+
+    .hero {
+      display: grid;
+      grid-template-columns: 1.2fr 0.8fr;
+      gap: 18px;
+      align-items: end;
+      margin-bottom: 20px;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 12px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.04);
+      color: var(--muted);
+      margin-bottom: 14px;
+    }
+
+    .dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--ok);
+      box-shadow: 0 0 14px rgba(52, 211, 153, 0.5);
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(34px, 4vw, 54px);
+      line-height: 1.02;
+      letter-spacing: -0.04em;
+    }
+
+    .sub {
+      margin: 14px 0 0;
+      max-width: 900px;
+      color: var(--muted);
+      line-height: 1.7;
+    }
+
+    .panel {
+      display: grid;
+      gap: 12px;
+      padding: 18px;
+      border-radius: 20px;
+      border: 1px solid var(--border);
+      background: var(--panel);
+      box-shadow: var(--shadow);
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+      margin-top: 12px;
+    }
+
+    .stat {
+      padding: 14px;
+      border-radius: 16px;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.08);
+    }
+
+    .stat .num {
+      font-size: 24px;
+      font-weight: 800;
+      margin-bottom: 4px;
+    }
+
+    .stat .label {
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .controls {
+      display: grid;
+      grid-template-columns: 2fr 1fr 1fr;
+      gap: 12px;
+      margin: 18px 0 22px;
+    }
+
+    input, select, button {
+      width: 100%;
+      border-radius: 14px;
+      border: 1px solid rgba(255,255,255,0.10);
+      background: rgba(6, 10, 18, 0.76);
+      color: var(--text);
+      padding: 13px 14px;
+      outline: none;
+      font-size: 14px;
+    }
+
+    button {
+      cursor: pointer;
+      font-weight: 700;
+      border: 0;
+      background: linear-gradient(135deg, var(--accent), #6c63ff);
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(12, 1fr);
+      gap: 18px;
+    }
+
+    .card {
+      grid-column: span 4;
+      border-radius: 20px;
+      padding: 18px;
+      border: 1px solid var(--border);
+      background: var(--card);
+      box-shadow: var(--shadow);
+    }
+
+    .card h2 {
+      margin: 0 0 10px;
+      font-size: 18px;
+      line-height: 1.4;
+    }
+
+    .meta {
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.6;
+    }
+
+    .summary {
+      margin: 12px 0;
+      color: #d7e4fb;
+      line-height: 1.7;
+      font-size: 14px;
+    }
+
+    .pill-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin: 12px 0 0;
+    }
+
+    .pill {
+      display: inline-flex;
+      padding: 6px 10px;
+      border-radius: 999px;
+      background: rgba(79, 140, 255, 0.12);
+      border: 1px solid rgba(79, 140, 255, 0.18);
+      color: #d5e4ff;
+      font-size: 12px;
+    }
+
+    .detail {
+      margin-top: 14px;
+      padding-top: 14px;
+      border-top: 1px solid rgba(255,255,255,0.08);
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.6;
+      display: none;
+    }
+
+    .detail.show { display: block; }
+
+    .top-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 12px;
+      color: #d5e4ff;
+      text-decoration: none;
+    }
+
+    .top-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 12px;
+    }
+
+    .ghost-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 10px 14px;
+      border-radius: 14px;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      background: rgba(255, 255, 255, 0.05);
+      color: var(--text);
+      text-decoration: none;
+      font-size: 14px;
+      font-weight: 700;
+    }
+
+    @media (max-width: 980px) {
+      .hero, .controls, .card, .panel {
+        grid-template-columns: 1fr;
+        grid-column: 1 / -1;
+      }
+      .card { grid-column: 1 / -1; }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="hero">
+      <div>
+        <div class="badge"><span class="dot"></span>标准库 · National Standards Catalog</div>
+        <h1>化工安全标准库</h1>
+        <p class="sub">
+          这里是独立的标准浏览页，支持按标准号、名称、标签和场景搜索。你可以把它当成标准目录，也可以直接点进详情查看摘要、适用场景和来源。
+        </p>
+        <a class="top-link" href="/">&larr; 返回工作台</a>
+        <div class="top-actions">
+          <a class="ghost-btn" href="/standard-import.html">导入标准库</a>
+          <button class="ghost-btn" id="syncBtn" type="button">同步到知识库</button>
+          <a class="ghost-btn" href="javascript:void(0)" onclick="window.location.reload()">刷新目录</a>
+        </div>
+      </div>
+      <div class="panel">
+        <div>标准库里现在主要包含：特殊作业、安全标志、定位系统、PPE、SDS、防火、气体检测等常见化工安全条目。</div>
+        <div class="stats">
+          <div class="stat"><div class="num" id="totalCount">-</div><div class="label">标准条目</div></div>
+          <div class="stat"><div class="num" id="matchedCount">-</div><div class="label">当前命中</div></div>
+        </div>
+        <div class="meta" id="syncStatus" style="margin-top: 12px;">将标准库同步到 AI 知识库后，顾问问答可以直接检索国标条款。</div>
+      </div>
+    </div>
+
+    <div class="controls">
+      <input id="searchInput" placeholder="搜索标准号、名称、标签、场景，比如 动火 / 受限空间 / 定位 / 防火" />
+      <select id="tagFilter">
+        <option value="">全部标签</option>
+      </select>
+      <button id="searchBtn">搜索</button>
+    </div>
+
+    <div class="grid" id="list"></div>
+  </div>
+
+  <script>
+    const state = { items: [], filtered: [] };
+    const $ = (id) => document.getElementById(id);
+
+    function escapeHtml(text) {
+      return String(text || '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+    }
+
+    function render() {
+      const list = $('list');
+      const items = state.filtered;
+      $('matchedCount').textContent = String(items.length);
+      list.innerHTML = items.map(item => `
+        <article class="card">
+          <h2>${escapeHtml(item.code)} ${escapeHtml(item.name)}</h2>
+          <div class="meta">
+            <div>状态：${escapeHtml(item.status || '-')}</div>
+            <div>当前版本：${escapeHtml(item.currentVersionNo == null ? '-' : item.currentVersionNo)}</div>
+            <div>发布日期：${escapeHtml(item.publishDate || '-')}</div>
+            <div>实施日期：${escapeHtml(item.implementDate || '-')}</div>
+            <div>适用范围：${escapeHtml(item.scope || '-')}</div>
+          </div>
+          <div class="summary">${escapeHtml(item.summary || '')}</div>
+          <div class="pill-row">
+            ${(item.tags || []).map(tag => `<span class="pill">${escapeHtml(tag)}</span>`).join('')}
+          </div>
+          <div class="pill-row" style="margin-top: 10px;">
+            ${(item.scenarios || []).map(s => `<span class="pill" style="background: rgba(22,200,192,0.10); border-color: rgba(22,200,192,0.16);">${escapeHtml(s)}</span>`).join('')}
+          </div>
+          <div class="top-actions" style="margin-top: 14px;">
+            <a class="ghost-btn" href="/standard-versions.html?code=${encodeURIComponent(item.code)}">版本历史</a>
+            <a class="ghost-btn" href="/standard-import.html?code=${encodeURIComponent(item.code)}">编辑条目</a>
+          </div>
+          <div class="detail" id="detail-${escapeHtml(item.code)}">
+            <div><strong>来源：</strong>${escapeHtml(item.sourceUrl || '本地初始化种子')}</div>
+            <div style="margin-top:8px;"><strong>归档状态：</strong>${item.archived ? '已归档' : '正常'}</div>
+            <div style="margin-top:8px;"><strong>检索建议：</strong>可用标准号、场景、标签直接搜索，也可在工作台中提问。</div>
+          </div>
+          <button style="margin-top: 14px;" onclick="toggleDetail('${escapeHtml(item.code)}')">查看详情</button>
+        </article>
+      `).join('');
+    }
+
+    function toggleDetail(code) {
+      const el = document.getElementById(`detail-${code}`);
+      if (el) el.classList.toggle('show');
+    }
+
+    function applyFilter() {
+      const q = $('searchInput').value.trim().toLowerCase();
+      const tag = $('tagFilter').value.trim().toLowerCase();
+      state.filtered = state.items.filter(item => {
+        const matchesQuery = !q || [item.code, item.name, item.summary, item.scope, ...(item.tags || []), ...(item.scenarios || [])]
+          .filter(Boolean)
+          .some(v => String(v).toLowerCase().includes(q));
+        const matchesTag = !tag || (item.tags || []).some(t => String(t).toLowerCase() === tag);
+        return matchesQuery && matchesTag;
+      });
+      render();
+    }
+
+    function initTags() {
+      const tags = Array.from(new Set(state.items.flatMap(item => item.tags || []))).sort();
+      const select = $('tagFilter');
+      tags.forEach(tag => {
+        const opt = document.createElement('option');
+        opt.value = tag;
+        opt.textContent = tag;
+        select.appendChild(opt);
+      });
+    }
+
+    async function load() {
+      const response = await fetch('/api/standards/library');
+      state.items = await response.json();
+      state.filtered = state.items.slice();
+      $('totalCount').textContent = String(state.items.length);
+      initTags();
+      render();
+    }
+
+    async function syncKnowledgeBase() {
+      const status = $('syncStatus');
+      status.textContent = '正在同步标准库到知识库...';
+      try {
+        const response = await fetch('/api/standards/library/sync', { method: 'POST' });
+        const result = await response.json();
+        status.innerHTML = `同步完成：已同步 <strong>${escapeHtml(result.synced ?? 0)}</strong> 条，失败 <strong>${escapeHtml(result.failed ?? 0)}</strong> 条。`;
+      } catch (error) {
+        status.textContent = '同步失败：' + error.message;
+      }
+    }
+
+    $('searchBtn').addEventListener('click', applyFilter);
+    $('searchInput').addEventListener('input', applyFilter);
+    $('tagFilter').addEventListener('change', applyFilter);
+    $('syncBtn').addEventListener('click', syncKnowledgeBase);
+    window.toggleDetail = toggleDetail;
+
+    load().catch(err => {
+      $('list').innerHTML = `<div class="card" style="grid-column: 1 / -1;">加载失败：${escapeHtml(err.message)}</div>`;
+    });
+  </script>
+</body>
+</html>

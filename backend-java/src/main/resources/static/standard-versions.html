@@ -1,0 +1,389 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>版本历史 · 化工安全标准顾问</title>
+  <style>
+    :root {
+      --bg: #07111f;
+      --panel: rgba(16, 22, 36, 0.82);
+      --card: rgba(19, 27, 44, 0.88);
+      --text: #e8f1ff;
+      --muted: #8ea4c8;
+      --accent: #4f8cff;
+      --ok: #34d399;
+      --border: rgba(255, 255, 255, 0.09);
+      --shadow: 0 24px 70px rgba(0, 0, 0, 0.25);
+      font-synthesis-weight: none;
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background:
+        radial-gradient(circle at top left, rgba(79, 140, 255, 0.18), transparent 28%),
+        radial-gradient(circle at top right, rgba(52, 211, 153, 0.12), transparent 22%),
+        linear-gradient(180deg, #07111f 0%, #0d172a 45%, #111827 100%);
+      color: var(--text);
+      font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    .wrap {
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: 36px 20px 64px;
+    }
+
+    .hero {
+      display: grid;
+      grid-template-columns: 1.2fr 0.8fr;
+      gap: 18px;
+      align-items: end;
+      margin-bottom: 20px;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(34px, 4vw, 54px);
+      line-height: 1.02;
+      letter-spacing: -0.04em;
+    }
+
+    .sub {
+      margin: 14px 0 0;
+      max-width: 860px;
+      color: var(--muted);
+      line-height: 1.7;
+      font-size: 15px;
+    }
+
+    .panel {
+      padding: 18px;
+      border-radius: 20px;
+      border: 1px solid var(--border);
+      background: var(--panel);
+      box-shadow: var(--shadow);
+    }
+
+    .toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin: 18px 0 20px;
+    }
+
+    .btn, input {
+      border-radius: 14px;
+      border: 1px solid rgba(255,255,255,0.10);
+      background: rgba(6, 10, 18, 0.76);
+      color: var(--text);
+      padding: 12px 14px;
+      outline: none;
+      font-size: 14px;
+    }
+
+    .btn {
+      appearance: none;
+      cursor: pointer;
+      font-weight: 700;
+      border: 0;
+      background: linear-gradient(135deg, var(--accent), #6c63ff);
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .btn.ghost {
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.12);
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(12, 1fr);
+      gap: 18px;
+    }
+
+    .card {
+      grid-column: span 6;
+      border-radius: 22px;
+      padding: 20px;
+      border: 1px solid var(--border);
+      background: var(--card);
+      box-shadow: var(--shadow);
+    }
+
+    .card.full { grid-column: 1 / -1; }
+
+    .card h2 {
+      margin: 0 0 12px;
+      font-size: 20px;
+    }
+
+    .meta {
+      display: grid;
+      gap: 8px;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    .diff-list {
+      margin: 10px 0 0;
+      padding: 0;
+      list-style: none;
+      display: grid;
+      gap: 8px;
+    }
+
+    .diff-item {
+      padding: 10px 12px;
+      border-radius: 12px;
+      border: 1px solid rgba(255,255,255,0.08);
+      background: rgba(255,255,255,0.03);
+    }
+
+    .preview-box {
+      margin-top: 10px;
+      padding: 12px 14px;
+      border-radius: 14px;
+      border: 1px solid rgba(255,255,255,0.08);
+      background: rgba(6, 10, 18, 0.55);
+      color: #d6e5ff;
+      line-height: 1.65;
+    }
+
+    .preview-box.error {
+      border-color: rgba(248, 113, 113, 0.35);
+      color: #fecaca;
+    }
+
+    .preview-box.ok {
+      border-color: rgba(52, 211, 153, 0.35);
+      color: #bbf7d0;
+    }
+
+    pre {
+      margin: 0;
+      min-height: 120px;
+      padding: 16px;
+      border-radius: 16px;
+      border: 1px solid rgba(255,255,255,0.08);
+      background: rgba(6, 10, 18, 0.82);
+      color: #d6e5ff;
+      white-space: pre-wrap;
+      word-break: break-word;
+      line-height: 1.65;
+    }
+
+    .version-item {
+      padding: 14px;
+      border-radius: 16px;
+      border: 1px solid rgba(255,255,255,0.08);
+      background: rgba(255,255,255,0.03);
+      display: grid;
+      gap: 8px;
+    }
+
+    .version-item .row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .version-item .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    @media (max-width: 980px) {
+      .hero, .card {
+        grid-template-columns: 1fr;
+      }
+      .card { grid-column: 1 / -1; }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="hero">
+      <div>
+        <h1>版本历史</h1>
+        <p class="sub">
+          这里展示某个标准条目的版本列表、历史快照和当前版本对比。你可以从标准库页直接跳过来查看，也可以手工输入标准号。
+        </p>
+      </div>
+      <div class="panel meta">
+        <div><strong>Compare</strong> 当前版本 vs 历史版本</div>
+        <div><strong>Restore</strong> 恢复到指定版本</div>
+        <div><strong>Target</strong> Private Deploy</div>
+      </div>
+    </div>
+
+    <div class="toolbar">
+      <a class="btn ghost" href="/standards.html">返回标准库</a>
+      <a class="btn ghost" href="/standard-import.html">返回导入页</a>
+      <a class="btn ghost" href="/">返回工作台</a>
+      <input id="codeInput" placeholder="输入标准号，例如 GB 30871-2022" style="min-width: 280px; flex: 1;" />
+      <button class="btn" id="loadBtn">加载历史</button>
+    </div>
+
+    <div class="grid">
+      <div class="card full">
+        <h2>当前条目</h2>
+        <pre id="currentBox">等待加载…</pre>
+      </div>
+
+      <div class="card full">
+        <h2>版本列表</h2>
+        <div id="versionList" class="meta">等待加载…</div>
+      </div>
+
+      <div class="card">
+        <h2>对比结果</h2>
+        <pre id="compareBox">等待对比…</pre>
+        <div id="compareSummary"></div>
+      </div>
+
+      <div class="card">
+        <h2>历史快照</h2>
+        <pre id="snapshotBox">点击某个版本查看快照</pre>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const $ = (id) => document.getElementById(id);
+
+    function escapeHtml(text) {
+      return String(text || '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+    }
+
+    function parseQuery() {
+      const params = new URLSearchParams(window.location.search);
+      return params.get('code') || '';
+    }
+
+    function renderPreview(preview) {
+      const box = $('compareSummary');
+      if (!preview || typeof preview !== 'object') {
+        box.innerHTML = '';
+        return;
+      }
+      const issues = Array.isArray(preview.issues) ? preview.issues : [];
+      const diffs = Array.isArray(preview.diffs) ? preview.diffs : [];
+      const issueHtml = issues.length
+        ? `<div class="preview-box error"><strong>差异问题</strong><ul class="diff-list">${issues.map(issue => `<li class="diff-item">${escapeHtml(issue)}</li>`).join('')}</ul></div>`
+        : `<div class="preview-box ok"><strong>可对比</strong> 结果已生成。</div>`;
+      const diffHtml = diffs.length
+        ? `<div class="preview-box"><strong>字段差异</strong><ul class="diff-list">${diffs.map(diff => `
+            <li class="diff-item">
+              <strong>${escapeHtml(diff.field || '-')}</strong>
+              <div>历史版本：${escapeHtml(diff.beforeValue || '空')}</div>
+              <div>当前版本：${escapeHtml(diff.afterValue || '空')}</div>
+            </li>
+          `).join('')}</ul></div>`
+        : `<div class="preview-box"><strong>字段差异</strong> 当前没有差异。</div>`;
+      box.innerHTML = issueHtml + diffHtml;
+    }
+
+    async function fetchJson(url, options) {
+      const response = await fetch(url, options);
+      const text = await response.text();
+      try {
+        return JSON.parse(text);
+      } catch (err) {
+        return { raw: text, status: response.status };
+      }
+    }
+
+    async function loadHistory() {
+      const code = $('codeInput').value.trim();
+      if (!code) {
+        $('versionList').innerHTML = '请先输入标准号。';
+        return;
+      }
+      $('currentBox').textContent = '加载中...';
+      $('versionList').innerHTML = '加载中...';
+      $('compareBox').textContent = '等待对比...';
+      $('snapshotBox').textContent = '点击某个版本查看快照';
+      $('compareSummary').innerHTML = '';
+
+      const current = await fetchJson('/api/standards/library/detail?code=' + encodeURIComponent(code));
+      $('currentBox').textContent = JSON.stringify(current, null, 2);
+
+      const versions = await fetchJson('/api/standards/library/versions?code=' + encodeURIComponent(code));
+      if (!Array.isArray(versions) || versions.length === 0) {
+        $('versionList').innerHTML = '<div class="version-item">当前没有版本历史。</div>';
+        return;
+      }
+      $('versionList').innerHTML = versions.map(version => `
+        <div class="version-item">
+          <div class="row">
+            <strong>V${escapeHtml(version.versionNo)}</strong>
+            <span>${escapeHtml(version.changeType || '-')}</span>
+            <span>${escapeHtml(version.createdAt || '-')}</span>
+          </div>
+          <div>${escapeHtml(version.changeNote || '')}</div>
+          <div class="actions">
+            <button class="btn ghost" onclick="compareVersion(${escapeHtml(JSON.stringify(version.versionNo))})">对比当前</button>
+            <button class="btn ghost" onclick="showSnapshot(${escapeHtml(JSON.stringify(version.snapshotJson || ''))})">查看快照</button>
+            <button class="btn" onclick="restoreVersion(${escapeHtml(JSON.stringify(version.versionNo))})">恢复此版</button>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    async function compareVersion(versionNo) {
+      const code = $('codeInput').value.trim();
+      if (!code) return;
+      const result = await fetchJson('/api/standards/library/compare?code=' + encodeURIComponent(code) + '&versionNo=' + encodeURIComponent(versionNo));
+      $('compareBox').textContent = JSON.stringify(result, null, 2);
+      renderPreview(result);
+    }
+
+    async function restoreVersion(versionNo) {
+      const code = $('codeInput').value.trim();
+      if (!code) return;
+      const result = await fetchJson('/api/standards/library/restore?code=' + encodeURIComponent(code) + '&versionNo=' + encodeURIComponent(versionNo), { method: 'POST' });
+      $('currentBox').textContent = JSON.stringify(result, null, 2);
+      await loadHistory();
+    }
+
+    function showSnapshot(snapshotJson) {
+      try {
+        const data = JSON.parse(snapshotJson);
+        $('snapshotBox').textContent = JSON.stringify(data, null, 2);
+      } catch (err) {
+        $('snapshotBox').textContent = snapshotJson || '快照为空';
+      }
+    }
+
+    $('loadBtn').addEventListener('click', loadHistory);
+
+    const initialCode = parseQuery();
+    if (initialCode) {
+      $('codeInput').value = initialCode;
+      loadHistory().catch(err => {
+        $('versionList').innerHTML = '<div class="version-item">加载失败：' + escapeHtml(err.message) + '</div>';
+      });
+    }
+
+    window.compareVersion = compareVersion;
+    window.restoreVersion = restoreVersion;
+    window.showSnapshot = showSnapshot;
+  </script>
+</body>
+</html>

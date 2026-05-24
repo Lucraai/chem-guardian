@@ -1,0 +1,640 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>导入标准库 · 化工安全标准顾问</title>
+  <style>
+    :root {
+      --bg: #07111f;
+      --panel: rgba(16, 22, 36, 0.82);
+      --card: rgba(19, 27, 44, 0.88);
+      --text: #e8f1ff;
+      --muted: #8ea4c8;
+      --accent: #4f8cff;
+      --ok: #34d399;
+      --border: rgba(255, 255, 255, 0.09);
+      --shadow: 0 24px 70px rgba(0, 0, 0, 0.25);
+      font-synthesis-weight: none;
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background:
+        radial-gradient(circle at top left, rgba(79, 140, 255, 0.18), transparent 28%),
+        radial-gradient(circle at top right, rgba(52, 211, 153, 0.12), transparent 22%),
+        linear-gradient(180deg, #07111f 0%, #0d172a 45%, #111827 100%);
+      color: var(--text);
+      font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    .wrap {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 36px 20px 64px;
+    }
+
+    .hero {
+      display: grid;
+      grid-template-columns: 1.3fr 0.7fr;
+      gap: 18px;
+      align-items: end;
+      margin-bottom: 18px;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(34px, 4vw, 54px);
+      line-height: 1.02;
+      letter-spacing: -0.04em;
+    }
+
+    .sub {
+      margin: 14px 0 0;
+      max-width: 860px;
+      color: var(--muted);
+      line-height: 1.7;
+      font-size: 15px;
+    }
+
+    .panel {
+      padding: 18px;
+      border-radius: 20px;
+      border: 1px solid var(--border);
+      background: var(--panel);
+      box-shadow: var(--shadow);
+    }
+
+    .meta {
+      display: grid;
+      gap: 10px;
+      color: var(--muted);
+    }
+
+    .meta strong { color: var(--text); }
+
+    .toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin: 18px 0 20px;
+    }
+
+    .btn {
+      appearance: none;
+      border: 0;
+      border-radius: 14px;
+      padding: 12px 16px;
+      background: linear-gradient(135deg, var(--accent), #6c63ff);
+      color: var(--text);
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .btn.ghost {
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.12);
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(12, 1fr);
+      gap: 18px;
+    }
+
+    .card {
+      grid-column: span 12;
+      border-radius: 22px;
+      padding: 20px;
+      border: 1px solid var(--border);
+      background: var(--card);
+      box-shadow: var(--shadow);
+    }
+
+    .card h2 {
+      margin: 0 0 12px;
+      font-size: 20px;
+    }
+
+    .split {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 18px;
+    }
+
+    .field {
+      display: grid;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+
+    label {
+      font-size: 13px;
+      color: #bfd0ef;
+    }
+
+    textarea, input {
+      width: 100%;
+      border-radius: 14px;
+      border: 1px solid rgba(255,255,255,0.10);
+      background: rgba(6, 10, 18, 0.76);
+      color: var(--text);
+      padding: 13px 14px;
+      outline: none;
+      font-size: 14px;
+    }
+
+    textarea {
+      min-height: 280px;
+      resize: vertical;
+      line-height: 1.65;
+      font-family: Consolas, "SFMono-Regular", monospace;
+    }
+
+    pre {
+      margin: 0;
+      min-height: 120px;
+      padding: 16px;
+      border-radius: 16px;
+      border: 1px solid rgba(255,255,255,0.08);
+      background: rgba(6, 10, 18, 0.82);
+      color: #d6e5ff;
+      white-space: pre-wrap;
+      word-break: break-word;
+      line-height: 1.65;
+    }
+
+    .preview-box {
+      margin-top: 10px;
+      padding: 12px 14px;
+      border-radius: 14px;
+      border: 1px solid rgba(255,255,255,0.08);
+      background: rgba(6, 10, 18, 0.55);
+      color: #d6e5ff;
+      line-height: 1.65;
+    }
+
+    .preview-box.error {
+      border-color: rgba(248, 113, 113, 0.35);
+      color: #fecaca;
+    }
+
+    .preview-box.ok {
+      border-color: rgba(52, 211, 153, 0.35);
+      color: #bbf7d0;
+    }
+
+    .diff-list {
+      margin: 10px 0 0;
+      padding: 0;
+      list-style: none;
+      display: grid;
+      gap: 8px;
+    }
+
+    .diff-item {
+      padding: 10px 12px;
+      border-radius: 12px;
+      border: 1px solid rgba(255,255,255,0.08);
+      background: rgba(255,255,255,0.03);
+    }
+
+    .diff-item strong {
+      display: inline-block;
+      margin-bottom: 4px;
+    }
+
+    .hint {
+      margin-top: 8px;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.6;
+    }
+
+    .subtle {
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.6;
+    }
+
+    @media (max-width: 980px) {
+      .hero { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="hero">
+      <div>
+        <h1>标准库导入</h1>
+        <p class="sub">
+          把标准条目直接导入数据库。你可以粘贴 JSON 批量导入，也可以一键重建默认种子。
+          后面这个页面会继续扩成“导入、编辑、校验、版本管理”一体化页面。
+        </p>
+      </div>
+      <div class="panel meta">
+        <div><strong>Target</strong> /api/standards/library/import</div>
+        <div><strong>Seed</strong> /api/standards/library/seed</div>
+        <div><strong>Mode</strong> Private Deploy</div>
+        <div><strong>Entry</strong> Database Persisted</div>
+      </div>
+    </div>
+
+    <div class="toolbar">
+      <a class="btn ghost" href="/standards.html">返回标准库</a>
+      <a class="btn ghost" href="/">返回工作台</a>
+      <button class="btn ghost" id="templateBtn">载入模板</button>
+      <button class="btn" id="seedBtn">重建默认种子</button>
+      <button class="btn" id="importBtn">导入 JSON</button>
+      <button class="btn ghost" id="exportJsonBtn">导出 JSON</button>
+      <button class="btn ghost" id="exportMdBtn">导出 Markdown</button>
+      <button class="btn ghost" id="exportCsvBtn">导出 CSV</button>
+    </div>
+
+    <div class="grid">
+      <div class="card">
+        <h2>导入 JSON</h2>
+        <div class="field">
+          <label for="payload">请求体</label>
+          <textarea id="payload"></textarea>
+          <div class="hint">格式与 <code>POST /api/standards/library/import</code> 一致，字段名使用 <code>code</code>、<code>name</code>、<code>tags</code>、<code>scenarios</code> 等。</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>结果</h2>
+        <pre id="result">等待操作…</pre>
+        <div id="previewSummary"></div>
+      </div>
+
+      <div class="card">
+        <h2>单条管理</h2>
+        <div class="field">
+          <label for="manageCode">标准号</label>
+          <input id="manageCode" placeholder="例如 GB 30871-2022" />
+        </div>
+        <div class="toolbar">
+          <button class="btn ghost" id="loadBtn">加载条目</button>
+          <button class="btn ghost" id="versionsBtn">查看版本</button>
+          <button class="btn ghost" id="previewBtn">预览变更</button>
+          <button class="btn ghost" id="compareBtn">对比版本</button>
+          <a class="btn ghost" id="historyLink" href="/standard-versions.html">版本历史页</a>
+          <button class="btn ghost" id="deleteBtn">删除条目</button>
+          <button class="btn ghost" id="restoreBtn">恢复版本</button>
+        </div>
+        <div class="field">
+          <label for="restoreVersion">恢复版本号</label>
+          <input id="restoreVersion" placeholder="例如 1" />
+        </div>
+        <div class="field">
+          <label for="singlePayload">条目 JSON</label>
+          <textarea id="singlePayload" style="min-height:220px;"></textarea>
+          <div class="hint">加载条目后可直接编辑，再点“保存修改”把它写回数据库。</div>
+        </div>
+        <div class="toolbar">
+          <button class="btn" id="saveBtn">保存修改</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>批量操作</h2>
+        <div class="field">
+          <label for="batchCodes">标准号列表</label>
+          <textarea id="batchCodes" style="min-height:120px;" placeholder="一行一个标准号，例如&#10;GB 30871-2022&#10;GB 45673-2025"></textarea>
+          <div class="subtle">用于批量归档、批量恢复，也可以复制后直接当作导入清单的初始参考。</div>
+        </div>
+        <div class="field">
+          <label for="batchNote">批量备注</label>
+          <input id="batchNote" placeholder="例如：季度整理 / 旧版下架 / 迎检前整理" />
+        </div>
+        <div class="toolbar">
+          <button class="btn ghost" id="batchArchiveBtn">批量归档</button>
+          <button class="btn ghost" id="batchRestoreBtn">批量恢复</button>
+          <button class="btn ghost" id="batchImportBtn">批量导入当前 JSON</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const $ = (id) => document.getElementById(id);
+
+    function escapeHtml(text) {
+      return String(text || '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+    }
+
+    const sample = {
+      items: [
+        {
+          code: "GB 30871-2022",
+          name: "危险化学品企业特殊作业安全规范",
+          status: "现行",
+          publishDate: "2022-03-15",
+          implementDate: "2022-10-01",
+          scope: "危险化学品企业的特殊作业管理",
+          summary: "重点面向特殊作业许可、审批、现场条件确认、监护、检测、隔离和应急准备。",
+          tags: ["特殊作业", "作业票", "监护"],
+          scenarios: ["动火作业", "受限空间", "高处作业"],
+          sourceUrl: "https://std.samr.gov.cn/gb/search/gbDetailed?id=DAB6B92C0762FC96E05397BE0A0A5F84"
+        }
+      ]
+    };
+
+    $('payload').value = JSON.stringify(sample, null, 2);
+
+    const params = new URLSearchParams(window.location.search);
+    const initialCode = params.get('code');
+    function syncHistoryLink(code) {
+      $('historyLink').href = code ? '/standard-versions.html?code=' + encodeURIComponent(code) : '/standard-versions.html';
+    }
+    if (initialCode) {
+      $('manageCode').value = initialCode;
+      syncHistoryLink(initialCode);
+      fetch('/api/standards/library/detail?code=' + encodeURIComponent(initialCode))
+        .then(response => response.json())
+        .then(item => {
+          $('singlePayload').value = JSON.stringify(item, null, 2);
+          $('result').textContent = JSON.stringify(item, null, 2);
+        })
+        .catch(() => {});
+    }
+    $('manageCode').addEventListener('input', () => syncHistoryLink($('manageCode').value.trim()));
+
+    async function requestJson(url, method, body) {
+      const options = {
+        method,
+        headers: { 'Content-Type': 'application/json' }
+      };
+      if (body !== undefined) {
+        options.body = JSON.stringify(body);
+      }
+      const response = await fetch(url, options);
+      const text = await response.text();
+      try {
+        return JSON.parse(text);
+      } catch (err) {
+        return { status: response.status, raw: text };
+      }
+    }
+
+    function renderPreview(preview) {
+      const box = $('previewSummary');
+      if (!preview || typeof preview !== 'object') {
+        box.innerHTML = '';
+        return;
+      }
+      const issues = Array.isArray(preview.issues) ? preview.issues : [];
+      const diffs = Array.isArray(preview.diffs) ? preview.diffs : [];
+      const issueHtml = issues.length
+        ? `<div class="preview-box error"><strong>校验问题</strong><ul class="diff-list">${issues.map(issue => `<li class="diff-item">${escapeHtml(issue)}</li>`).join('')}</ul></div>`
+        : `<div class="preview-box ok"><strong>校验通过</strong> 可以继续保存。</div>`;
+      const diffHtml = diffs.length
+        ? `<div class="preview-box"><strong>字段差异</strong><ul class="diff-list">${diffs.map(diff => `
+            <li class="diff-item">
+              <strong>${escapeHtml(diff.field || '-')}</strong>
+              <div>修改前：${escapeHtml(diff.beforeValue || '空')}</div>
+              <div>修改后：${escapeHtml(diff.afterValue || '空')}</div>
+            </li>
+          `).join('')}</ul></div>`
+        : `<div class="preview-box"><strong>字段差异</strong> 当前内容没有变化。</div>`;
+      box.innerHTML = issueHtml + diffHtml;
+    }
+
+    function parseCodes(text) {
+      return String(text || '')
+        .split(/[\r\n,，;；]+/)
+        .map(v => v.trim())
+        .filter(Boolean);
+    }
+
+    function downloadText(filename, content, mimeType) {
+      const blob = new Blob([content], { type: mimeType || 'text/plain;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
+    }
+
+    $('seedBtn').addEventListener('click', async () => {
+      $('result').textContent = '正在重建默认种子...';
+      try {
+        const result = await requestJson('/api/standards/library/seed', 'POST');
+        $('result').textContent = JSON.stringify(result, null, 2);
+      } catch (err) {
+        $('result').textContent = '失败：' + err.message;
+      }
+    });
+
+    $('importBtn').addEventListener('click', async () => {
+      $('result').textContent = '正在导入...';
+      try {
+        const body = JSON.parse($('payload').value);
+        const result = await requestJson('/api/standards/library/import', 'POST', body);
+        $('result').textContent = JSON.stringify(result, null, 2);
+      } catch (err) {
+        $('result').textContent = '失败：' + err.message;
+      }
+    });
+
+    $('templateBtn').addEventListener('click', async () => {
+      $('result').textContent = '正在加载模板...';
+      try {
+        const template = await requestJson('/api/standards/library/template', 'GET');
+        $('payload').value = JSON.stringify(template, null, 2);
+        $('result').textContent = JSON.stringify(template, null, 2);
+      } catch (err) {
+        $('result').textContent = '模板加载失败：' + err.message;
+      }
+    });
+
+    async function exportLibrary(format, filename) {
+      try {
+        $('result').textContent = '正在导出...';
+        const response = await fetch('/api/standards/library/export?format=' + encodeURIComponent(format));
+        const text = await response.text();
+        $('result').textContent = text;
+        downloadText(filename, text, format === 'csv' ? 'text/csv;charset=utf-8' : 'text/plain;charset=utf-8');
+      } catch (err) {
+        $('result').textContent = '导出失败：' + err.message;
+      }
+    }
+
+    $('exportJsonBtn').addEventListener('click', () => exportLibrary('json', 'standard-library.json'));
+    $('exportMdBtn').addEventListener('click', () => exportLibrary('markdown', 'standard-library.md'));
+    $('exportCsvBtn').addEventListener('click', () => exportLibrary('csv', 'standard-library.csv'));
+
+    $('loadBtn').addEventListener('click', async () => {
+      const code = $('manageCode').value.trim();
+      if (!code) {
+        $('result').textContent = '请先填写标准号。';
+        return;
+      }
+      try {
+        const response = await fetch('/api/standards/library/detail?code=' + encodeURIComponent(code));
+        const item = await response.json();
+        $('singlePayload').value = JSON.stringify(item, null, 2);
+        $('result').textContent = JSON.stringify(item, null, 2);
+      } catch (err) {
+        $('result').textContent = '加载失败：' + err.message;
+      }
+    });
+
+    $('saveBtn').addEventListener('click', async () => {
+      const code = $('manageCode').value.trim();
+      if (!code) {
+        $('result').textContent = '请先填写标准号。';
+        return;
+      }
+      try {
+        const body = JSON.parse($('singlePayload').value);
+        const result = await requestJson('/api/standards/library/detail?code=' + encodeURIComponent(code), 'PUT', body);
+        $('result').textContent = JSON.stringify(result, null, 2);
+        renderPreview(null);
+      } catch (err) {
+        $('result').textContent = '保存失败：' + err.message;
+      }
+    });
+
+    $('previewBtn').addEventListener('click', async () => {
+      const code = $('manageCode').value.trim();
+      if (!code) {
+        $('result').textContent = '请先填写标准号。';
+        return;
+      }
+      try {
+        const body = JSON.parse($('singlePayload').value);
+        const result = await requestJson('/api/standards/library/preview?code=' + encodeURIComponent(code), 'POST', body);
+        $('result').textContent = JSON.stringify(result, null, 2);
+        renderPreview(result);
+      } catch (err) {
+        $('result').textContent = '预览失败：' + err.message;
+      }
+    });
+
+    $('compareBtn').addEventListener('click', async () => {
+      const code = $('manageCode').value.trim();
+      const versionNo = $('restoreVersion').value.trim();
+      if (!code || !versionNo) {
+        $('result').textContent = '请先填写标准号和版本号。';
+        return;
+      }
+      try {
+        const response = await fetch('/api/standards/library/compare?code=' + encodeURIComponent(code) + '&versionNo=' + encodeURIComponent(versionNo));
+        const result = await response.json();
+        $('result').textContent = JSON.stringify(result, null, 2);
+        renderPreview(result);
+      } catch (err) {
+        $('result').textContent = '对比失败：' + err.message;
+      }
+    });
+
+    $('deleteBtn').addEventListener('click', async () => {
+      const code = $('manageCode').value.trim();
+      if (!code) {
+        $('result').textContent = '请先填写标准号。';
+        return;
+      }
+      try {
+        const response = await fetch('/api/standards/library/detail?code=' + encodeURIComponent(code) + '&note=' + encodeURIComponent('manual delete'), {
+          method: 'DELETE'
+        });
+        const text = await response.text();
+        $('result').textContent = text;
+      } catch (err) {
+        $('result').textContent = '删除失败：' + err.message;
+      }
+    });
+
+    $('versionsBtn').addEventListener('click', async () => {
+      const code = $('manageCode').value.trim();
+      if (!code) {
+        $('result').textContent = '请先填写标准号。';
+        return;
+      }
+      try {
+        const response = await fetch('/api/standards/library/versions?code=' + encodeURIComponent(code));
+        const result = await response.json();
+        $('result').textContent = JSON.stringify(result, null, 2);
+      } catch (err) {
+        $('result').textContent = '查询版本失败：' + err.message;
+      }
+    });
+
+    $('restoreBtn').addEventListener('click', async () => {
+      const code = $('manageCode').value.trim();
+      const versionNo = $('restoreVersion').value.trim();
+      if (!code || !versionNo) {
+        $('result').textContent = '请先填写标准号和恢复版本号。';
+        return;
+      }
+      try {
+        const result = await requestJson('/api/standards/library/restore?code=' + encodeURIComponent(code) + '&versionNo=' + encodeURIComponent(versionNo), 'POST');
+        $('result').textContent = JSON.stringify(result, null, 2);
+      } catch (err) {
+        $('result').textContent = '恢复失败：' + err.message;
+      }
+    });
+
+    $('batchImportBtn').addEventListener('click', async () => {
+      try {
+        const body = JSON.parse($('payload').value);
+        const result = await requestJson('/api/standards/library/batch/import', 'POST', body);
+        $('result').textContent = JSON.stringify(result, null, 2);
+      } catch (err) {
+        $('result').textContent = '批量导入失败：' + err.message;
+      }
+    });
+
+    $('batchArchiveBtn').addEventListener('click', async () => {
+      const codes = parseCodes($('batchCodes').value);
+      if (!codes.length) {
+        $('result').textContent = '请先填写标准号列表。';
+        return;
+      }
+      try {
+        const result = await requestJson('/api/standards/library/batch/archive', 'POST', {
+          codes,
+          note: $('batchNote').value.trim()
+        });
+        $('result').textContent = JSON.stringify(result, null, 2);
+      } catch (err) {
+        $('result').textContent = '批量归档失败：' + err.message;
+      }
+    });
+
+    $('batchRestoreBtn').addEventListener('click', async () => {
+      const codes = parseCodes($('batchCodes').value);
+      if (!codes.length) {
+        $('result').textContent = '请先填写标准号列表。';
+        return;
+      }
+      try {
+        const result = await requestJson('/api/standards/library/batch/restore', 'POST', {
+          codes,
+          note: $('batchNote').value.trim()
+        });
+        $('result').textContent = JSON.stringify(result, null, 2);
+      } catch (err) {
+        $('result').textContent = '批量恢复失败：' + err.message;
+      }
+    });
+  </script>
+</body>
+</html>
