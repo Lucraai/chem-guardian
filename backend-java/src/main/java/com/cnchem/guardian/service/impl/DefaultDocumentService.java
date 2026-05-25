@@ -85,9 +85,9 @@ public class DefaultDocumentService implements DocumentService {
                     entity,
                     DocumentIngestResponse.class
             );
-            DocumentIngestResponse body = responseEntity.getBody();
-            if (body != null) {
-                return body;
+            DocumentIngestResponse respBody = responseEntity.getBody();
+            if (respBody != null) {
+                return respBody;
             }
             DocumentIngestResponse response = new DocumentIngestResponse();
             response.setDocumentCode(documentCode);
